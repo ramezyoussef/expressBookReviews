@@ -82,4 +82,75 @@ public_users.get('/review/:isbn',function (req, res) {
     res.send(books[isbn].reviews);
 });
 
+
+public_users.get('/',async  function  (req, res) {
+    
+    try{
+        const bookList = await  getBooksAsync();
+                res.send(JSON.stringify(books,null,4));
+
+    } catch(error){
+        res.status(500).send("Failed to fetch books");
+    }
+
+});
+
+function getBooksAsync(){
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            resolve(books);
+        }, 1000);
+
+
+    });
+}
+public_users.get('/author/:author',async function (req, res) {
+   try{
+    const bookList = await getBooksAsync();
+    let r=[];
+    const author=req.params.author.toLowerCase();
+    for (let isbn in books) {
+    if (books[isbn].author.toLowerCase()===author) {
+     r.push(books[isbn])
+    }
+     
+    }
+    if (r.length > 0) {
+     res.send(r);
+    }else{
+     res.status(404).json({message:"not found"})
+    }}catch(error){
+        res.status(500).send("Failed to fetch books by title");
+    }
+ });
+public_users.get('/title/:title', async function (req, res) {
+    try{
+        const bookList=await getBooksAsync();
+    let isbncounter=1;
+    const max=Object.keys(books).length;
+    const title=req.params.title;
+    while(isbncounter <= max){
+             if (books[isbncounter].title==title) {
+                return res.send(books[isbncounter]);
+                 
+             }
+     isbncounter++;
+    }    res.status(404).json({message:"not found"})}catch(error){
+        res.status(500).send("Failed to fetch books by title");
+    }
+ 
+ });
+
+public_users.get('/isbn/:isbn',async function (req, res) {
+    try{
+        const bookList = await getBooksAsync();
+    const isbn=req.params.isbn;
+    res.send(books[isbn]);}
+    catch(error){
+        res.status(500).send("Failed to fetch books Detes");
+    }
+   });
+
+
+
 module.exports.general = public_users;
